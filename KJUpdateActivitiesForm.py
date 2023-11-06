@@ -12,50 +12,47 @@ class DatabaseManager:
         self.connection  = pyodbc.connect(self.connectionString)
     def query(self, SQLQuery):
         cursor = self.connection.cursor()
-        cursor.execute(SQLQuery)
-        return [list(row) for row in cursor.fetchall()]
+        try:
+            cursor.execute(SQLQuery)
+            out = cursor.fetchall()
+            return [list(row) for row in out]
+        except Exception as e:
+            return e
+    
+    def command(self, SQLCommand):
+        cursor = self.connection.cursor()
+        try:
+            cursor.execute(SQLCommand)
+            cursor.commit()
+            return 'Command success.'
+        except Exception as e:
+            return e
     
 DB = DatabaseManager()
 
-def getTrainerData():
-    '''get Trainer data from the SQL database'''
+def getTableData(tableName, whereClause=''):
+    qryStr = f'Select * from {tableName}'
+    cursor = DB.connection.cursor()
+    cursor.execute(' '.join([qryStr, whereClause]))
+    columnNames = [column[0] for column in cursor.description]
+    rowList = [row for row in cursor]
+    cursor.close()
+    return columnNames, rowList
 
-    SQLQuery = '''SELECT TrainerID, LastName, FirstName 
-        FROM  TrainerName_View 
-        ORDER BY LastName, FirstName'''
-
-    fieldList = ['TrainerID', 'LastName', 'FirstName']
-
-    rowList = DB.query(SQLQuery)
-    return fieldList, rowList
-
-def getActivityData(TrainerID=100):
-    '''get Activity data from the SQL database'''
-
-    SQLQuery = f'''SELECT ActivityName, LevelType, StartDate, StartTime, EndTime 
-        FROM  TrainerActivity_View
-        WHERE TrainerID = {TrainerID}'''
-    fieldList = ['ActivityName', 'LevelType', 'StartDate', 'StartTime', 'EndTime']
-
-    rowList = DB.query(SQLQuery)
-    return fieldList, rowList
-
-def getQualificationData(TrainerID=100):
-    '''get Qualification data from the SQL database'''
-
-    SQLQuery = f'''SELECT ActivityName, LevelType, ApprovalDate 
-        FROM  TrainerQualification_View
-        WHERE TrainerID = {TrainerID}'''
-    fieldList = ['ActivityName', 'LevelType', 'ApprovalDate']
-
-    rowList = DB.query(SQLQuery)
-    return fieldList, rowList
+def buildTree(columnNames, rows, parent, scrollBar, columnWidth=150):
+    T = ttk.Treeview(master=parent, columns=columnNames, show='headings', height=6, padding=5, yscrollcommand=scrollBar.set)
+    for i in range(len(columnNames)):
+        T.column('# '+str(i+1), anchor=tk.CENTER, width=columnWidth)
+        T.heading('# '+str(i+1), text=columnNames[i])
+    for row in [list(r) for r in rows]:
+        T.insert('', tk.END, text=row, values=row)
+    return T 
 
 def showGUI():
     window = tk.Tk()
     window.title('Trainers')
 
-    TrainerFields, TrainerRows = getTrainerData()
+    TrainerFields, TrainerRows = getTableData('TrainerName_View')
 
     TrainerInfoFrm = tk.Frame(master=window, relief=tk.GROOVE, padx=50, pady=10)
     TrainerInfoFrm.pack(anchor='w')
@@ -64,19 +61,9 @@ def showGUI():
     
     TrainerSb = tk.Scrollbar(master=TrainerInfoFrm, orient='vertical')
     TrainerSb.grid(column=1,row=1,sticky='ns')
-    TrainerTree = ttk.Treeview(master=TrainerInfoFrm, columns=TrainerFields, show='headings', height=6, padding=5, yscrollcommand=TrainerSb.set)
-    TrainerSb.config(command=TrainerTree.yview)
-
-    TrainerTree.column('# 1', anchor=tk.CENTER, width=100)
-    TrainerTree.heading('# 1', text='ID')
-    TrainerTree.column('# 2', anchor=tk.CENTER, width=200)
-    TrainerTree.heading('# 2', text='LastName')
-    TrainerTree.column('# 3', anchor=tk.CENTER, width=200)
-    TrainerTree.heading('# 3', text='FirstName')
+    TrainerTree = buildTree(TrainerFields, TrainerRows, TrainerInfoFrm, TrainerSb)
     TrainerTree.grid(column=0,row=1)
-
-    for row in TrainerRows:
-        TrainerTree.insert('', tk.END, text=row[0], values=row)
+    TrainerSb.config(command=TrainerTree.yview)
     
     BtnFrm = tk.Frame(master=window, relief=tk.GROOVE, pady=10, width=500)
     BtnFrm.pack()
@@ -85,7 +72,8 @@ def showGUI():
         TrainerID = TrainerTree.item(TrainerTree.focus())['values'][0]
         LastName = TrainerTree.item(TrainerTree.focus())['values'][1]
         FirstName = TrainerTree.item(TrainerTree.focus())['values'][2]
-        QualificationFields, QualificationRows = getQualificationData(TrainerID)
+        QualificationFields, QualificationRows = getTableData('TrainerQualification_View', f'WHERE TrainerID = {TrainerID}')
+        QualificationRows = [row[3:] for row in QualificationRows]
         win = tk.Tk()
         win.title(f"{FirstName} {LastName}\'s Qualifications")
 
@@ -96,18 +84,9 @@ def showGUI():
 
         QualificationSb = tk.Scrollbar(master=QualificationInfoFrm, orient='vertical')
         QualificationSb.grid(column=1,row=1,sticky='ns')
-        QualificationTree = ttk.Treeview(master=QualificationInfoFrm, columns=QualificationFields, show='headings', height=6, padding=5, yscrollcommand=QualificationSb.set)
+        QualificationTree = buildTree(['ActivityName', 'LevelType', 'ApprovalDate'], QualificationRows, QualificationInfoFrm, QualificationSb)
         QualificationSb.config(command=QualificationTree.yview)
-
-        QualificationTree.column('# 1', anchor=tk.CENTER, width=100)
-        QualificationTree.heading('# 1', text='ActivityName')
-        QualificationTree.column('# 2', anchor=tk.CENTER, width=200)
-        QualificationTree.heading('# 2', text='ActivityLevel')
-        QualificationTree.column('# 3', anchor=tk.CENTER, width=200)
-        QualificationTree.heading('# 3', text='ApprovalDate')
         QualificationTree.grid(column=0,row=1)
-        for row in QualificationRows:
-            QualificationTree.insert('', tk.END, text=row[0], values=row)
 
     QualificationBtn = tk.Button(master=BtnFrm, text='Show Qualifications', command=QualificationBtnHandler)
     QualificationBtn.grid(column=0,row=0)
@@ -116,8 +95,9 @@ def showGUI():
         TrainerID = TrainerTree.item(TrainerTree.focus())['values'][0]
         LastName = TrainerTree.item(TrainerTree.focus())['values'][1]
         FirstName = TrainerTree.item(TrainerTree.focus())['values'][2]
-        ActivityFields, ActivityRows = getActivityData(TrainerID)
-
+        ActivityFields, ActivityRows = getTableData('TrainerActivity_View', f'WHERE TrainerID = {TrainerID}')
+        ActivityFields = ActivityFields[3:]
+        ActivityRows = [row[3:] for row in ActivityRows]
         win = tk.Tk()
         win.title(f'{FirstName} {LastName}\'s Activities')
 
@@ -128,23 +108,9 @@ def showGUI():
 
         ActivitySb = tk.Scrollbar(master=ActivityInfoFrm, orient='vertical')
         ActivitySb.grid(column=1,row=1,sticky='ns')
-        ActivityTree = ttk.Treeview(master=ActivityInfoFrm, columns=ActivityFields, show='headings', height=6, padding=5, yscrollcommand=ActivitySb.set)
+        ActivityTree = buildTree(parent=ActivityInfoFrm, rows=ActivityRows, columnNames=ActivityFields, scrollBar=ActivitySb)
         ActivitySb.config(command=ActivityTree.yview)
-
-        ActivityTree.column('# 1', anchor=tk.CENTER, width=100)
-        ActivityTree.heading('# 1', text='ActivityName')
-        ActivityTree.column('# 2', anchor=tk.CENTER, width=100)
-        ActivityTree.heading('# 2', text='ActivityLevel')
-        ActivityTree.column('# 3', anchor=tk.CENTER, width=100)
-        ActivityTree.heading('# 3', text='StartDate')
-        ActivityTree.column('# 4', anchor=tk.CENTER, width=100)
-        ActivityTree.heading('# 4', text='StartTime')
-        ActivityTree.column('# 5', anchor=tk.CENTER, width=100)
-        ActivityTree.heading('# 5', text='EndTime')
         ActivityTree.grid(column=0,row=1)
-
-        for row in ActivityRows:
-            ActivityTree.insert('', tk.END, text=row[0], values=row)
 
     ActivityBtn = tk.Button(master=BtnFrm, text='Show Activities', command=ActivityBtnHandler)
     ActivityBtn.grid(column=1,row=0)

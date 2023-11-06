@@ -1,6 +1,6 @@
-DROP VIEW IF EXISTS TrainerQualification_View
-DROP VIEW IF EXISTS TrainerName_View
-DROP VIEW IF EXISTS TrainerActivity_View
+DROP VIEW IF EXISTS TrainerQualification_View;
+DROP VIEW IF EXISTS TrainerName_View;
+DROP VIEW IF EXISTS TrainerActivity_View;
 
 CREATE VIEW TrainerQualification_View AS
 SELECT
@@ -15,7 +15,7 @@ FROM
 JOIN
     Trainer T
 ON
-    T.TrainerID = Q.TrainerID
+    T.TrainerID = Q.TrainerID;
 
 CREATE VIEW TrainerName_View AS
 SELECT
@@ -23,7 +23,7 @@ SELECT
     LastName,
     FirstName
 FROM
-    Trainer
+    Trainer;
 
 CREATE VIEW TrainerActivity_View AS
 SELECT
@@ -40,4 +40,4 @@ FROM
 JOIN
     Trainer T 
 ON
-    S.TrainerID = T.TrainerID
+    S.TrainerID = T.TrainerID;

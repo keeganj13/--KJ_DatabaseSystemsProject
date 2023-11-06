@@ -13,10 +13,21 @@ class DatabaseManager:
         self.connection  = pyodbc.connect(self.connectionString)
     def query(self, SQLQuery):
         cursor = self.connection.cursor()
-        cursor.execute(SQLQuery)
-        out = cursor.fetchall()
-        cursor.commit()
-        return [list(row) for row in out]
+        try:
+            cursor.execute(SQLQuery)
+            out = cursor.fetchall()
+            return [list(row) for row in out]
+        except Exception as e:
+            return e
+    
+    def command(self, SQLCommand):
+        cursor = self.connection.cursor()
+        try:
+            cursor.execute(SQLCommand)
+            cursor.commit()
+            return 'Command success.'
+        except Exception as e:
+            return e
 
 DB = DatabaseManager()
 
@@ -24,44 +35,23 @@ def readFile(fileName):
     tmpFile = open(fileName, 'r')
     return tmpFile.readlines()
 
-createProjectTablesScript = ' '.join([row.strip() for row in readFile('KJCreateTables.sql')]).split(';')
-# print(createProjectTablesScript)
-for line in createProjectTablesScript:
-    DB.query(line)
-    # print(line,end='')
+projTableScript = ' '.join([row.strip() for row in readFile('KJCreateTables.sql')]).split(';')
+for line in projTableScript:
+    if len(line)> 1: print(DB.command(line))
 
-createProjectViewsScript = [line.strip() for line in readFile('KJCreateViews.sql')]
-index=0
-for line in createProjectViewsScript:
-    if 'DROP' in line:
-        DB.query(line)
-        # print(line)
-        index+=1
-    else:
-        break
 
-while index < len(createProjectViewsScript):
-    if 'CREATE' in createProjectViewsScript[index]:
-        j=1
-        while index + j < len(createProjectViewsScript) and 'CREATE' not in createProjectViewsScript[index+j]:
-            j += 1
-        DB.query(' '.join(createProjectViewsScript[index:index+j]))
-        # print(' '.join(createProjectViewsScript[index:index+j]))
-        index += j
-    else:
-        index += 1
+projViewScript = ' '.join([row.strip() for row in readFile('KJCreateViews.sql')]).split(';')
+for line in projViewScript:
+    if len(line)> 1: print(DB.command(line))
 
-createTablesScript = [line.strip() for line in readFile('SQLCreateTablesAndData.sql')]
-DB.query(' '.join(createTablesScript))
 
-DB.query('DROP VIEW IF EXISTS EmployeeName_View')
-# print('DROP VIEW IF EXISTS EmployeeName_View')
-DB.query('DROP VIEW IF EXISTS ProjectHrsWorkedEmpNum_View')
-# print('DROP VIEW IF EXISTS ProjectHrsWorkedEmpNum_View')
+tableScript = ' '.join([line.strip() for line in readFile('SQLCreateTablesAndData.sql')]).split(';')
+for line in tableScript:
+    if len(line)> 1: print(DB.command(line))
 
-employeeNameViewScript = [line.strip() for line in readFile('EmployeeName_View.sql')]
-DB.query(' '.join(employeeNameViewScript))
-# print(' '.join(employeeNameViewScript))
-projectEmployeeViewScript = [line.strip() for line in readFile('ProjectHrsWorkedEmpNum_View.sql')]
-DB.query(' '.join(projectEmployeeViewScript))
-# print(' '.join(projectEmployeeViewScript))
+employeeNameViewScript = ' '.join([line.strip() for line in readFile('EmployeeName_View.sql')]).split(';')
+for line in employeeNameViewScript:
+    if len(line)> 1: print(DB.command(line))
+projectEmployeeViewScript = ' '.join([line.strip() for line in readFile('ProjectHrsWorkedEmpNum_View.sql')]).split(';')
+for line in projectEmployeeViewScript:
+    if len(line)> 1: print(DB.command(line))
