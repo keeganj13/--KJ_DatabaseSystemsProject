@@ -59,12 +59,8 @@ CREATE TABLE Qualification(
         REFERENCES Trainer(TrainerID)
             ON UPDATE CASCADE
             ON DELETE CASCADE,
-    CONSTRAINT QualificationActivityLevelFK FOREIGN KEY(LevelType)
-        REFERENCES ActivityLevel(LevelType)
-            ON UPDATE CASCADE
-            ON DELETE CASCADE,
-    CONSTRAINT QualificationGeneralNameFK FOREIGN KEY(ActivityName)
-        REFERENCES GeneralActivity(ActivityName)
+    CONSTRAINT QualificationLevelNameFK FOREIGN KEY(LevelType, ActivityName)
+        REFERENCES ApprovedActivity(LevelType, ActivityName)
             ON UPDATE CASCADE
             ON DELETE CASCADE
 );
@@ -76,17 +72,13 @@ CREATE TABLE ScheduledActivity(
     StartDate       varchar(10) NOT NULL,
     StartTime       varchar(10) NULL,
     EndTime         varchar(10) NULL,
-    CONSTRAINT ScheduledActivityPK PRIMARY KEY(TrainerID, LevelType, ActivityName, StartDate),
+    CONSTRAINT ScheduledActivityPK PRIMARY KEY(TrainerID, LevelType, ActivityName),
     CONSTRAINT ScheduledActivityTrainerFK FOREIGN KEY(TrainerID)
         REFERENCES Trainer(TrainerID)
             ON UPDATE CASCADE
             ON DELETE CASCADE,
-    CONSTRAINT ScheduledActivityActivityLevelFK FOREIGN KEY(LevelType)
-        REFERENCES ActivityLevel(LevelType)
-            ON UPDATE CASCADE
-            ON DELETE CASCADE,
-    CONSTRAINT ScheduledActivityGeneralNameFK FOREIGN KEY(ActivityName)
-        REFERENCES GeneralActivity(ActivityName)
+    CONSTRAINT ScheduledActivityLevelNameFK FOREIGN KEY(LevelType, ActivityName)
+        REFERENCES ApprovedActivity(LevelType, ActivityName)
             ON UPDATE CASCADE
             ON DELETE CASCADE
 );
@@ -122,6 +114,7 @@ INSERT INTO ActivityLevel VALUES ('Expert');
 -- INSERT INTO ApprovedActivity VALUES (LevelType, ActivityName);
 INSERT INTO ApprovedActivity VALUES ('Beginner', 'Crossfit');
 INSERT INTO ApprovedActivity VALUES ('Beginner', 'Spinning');
+INSERT INTO ApprovedActivity VALUES ('Beginner', 'Pilates');
 INSERT INTO ApprovedActivity VALUES ('Easy', 'Zumba');
 INSERT INTO ApprovedActivity VALUES ('Easy', 'Pilates');
 INSERT INTO ApprovedActivity VALUES ('Intermediate', 'Spinning');
@@ -151,6 +144,7 @@ INSERT INTO Qualification VALUES (104, 'Intense', 'Zumba', '12-02-2022');
 
 INSERT INTO Qualification VALUES (105, 'Beginner', 'Spinning', '06-04-2016');
 INSERT INTO Qualification VALUES (105, 'Easy', 'Zumba', '08-17-2018');
+INSERT INTO Qualification VALUES (105, 'Beginner', 'Pilates', '11-04-2020');
 
 -- INSERT INTO ScheduledActivity VALUES (TrainerID, LevelType, ActivityName, StartDate, StartTime, EndTime);
 INSERT INTO ScheduledActivity VALUES (101, 'Beginner', 'Spinning', '11-09-2023', '6:00pm', '7:30pm');

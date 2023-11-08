@@ -36,12 +36,14 @@ def readFile(fileName):
     return tmpFile.readlines()
 
 projTableScript = ' '.join([row.strip() for row in readFile('KJCreateTables.sql')]).split(';')
-for line in projTableScript:
+for i in range(len(projTableScript)):
+    line = projTableScript[i]
     if len(line)> 1: print(DB.command(line))
 
 
 projViewScript = ' '.join([row.strip() for row in readFile('KJCreateViews.sql')]).split(';')
-for line in projViewScript:
+for i in range(len(projViewScript)):
+    line = projViewScript[i]
     if len(line)> 1: print(DB.command(line))
 
 

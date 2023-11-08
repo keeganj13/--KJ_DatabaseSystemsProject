@@ -39,7 +39,7 @@ def getTableData(tableName, whereClause=''):
     cursor.close()
     return columnNames, rowList
 
-def buildTree(columnNames, rows, parent, scrollBar, columnWidth=150):
+def buildTree(columnNames, rows, parent, scrollBar, columnWidth=100):
     T = ttk.Treeview(master=parent, columns=columnNames, show='headings', height=6, padding=5, yscrollcommand=scrollBar.set)
     for i in range(len(columnNames)):
         T.column('# '+str(i+1), anchor=tk.CENTER, width=columnWidth)
