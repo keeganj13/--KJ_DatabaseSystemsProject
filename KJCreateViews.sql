@@ -7,8 +7,8 @@ SELECT
     T.TrainerID,
     T.LastName,
     T.FirstName,
-    Q.ActivityName,
     Q.LevelType,
+    Q.ActivityName,
     Q.ApprovalDate
 FROM
     Qualification Q
@@ -30,8 +30,8 @@ SELECT
     T.TrainerID,
     T.LastName,
     T.FirstName,
-    S.ActivityName,
     S.LevelType,
+    S.ActivityName,
     S.StartDate,
     S.StartTime,
     S.EndTime

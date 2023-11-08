@@ -74,6 +74,7 @@ def showGUI():
         FirstName = TrainerTree.item(TrainerTree.focus())['values'][2]
         QualificationFields, QualificationRows = getTableData('TrainerQualification_View', f'WHERE TrainerID = {TrainerID}')
         QualificationRows = [row[3:] for row in QualificationRows]
+        QualificationFields = QualificationFields[3:]
         win = tk.Tk()
         win.title(f"{FirstName} {LastName}\'s Qualifications")
 
@@ -84,7 +85,7 @@ def showGUI():
 
         QualificationSb = tk.Scrollbar(master=QualificationInfoFrm, orient='vertical')
         QualificationSb.grid(column=1,row=1,sticky='ns')
-        QualificationTree = buildTree(['ActivityName', 'LevelType', 'ApprovalDate'], QualificationRows, QualificationInfoFrm, QualificationSb)
+        QualificationTree = buildTree(QualificationFields, QualificationRows, QualificationInfoFrm, QualificationSb)
         QualificationSb.config(command=QualificationTree.yview)
         QualificationTree.grid(column=0,row=1)
 

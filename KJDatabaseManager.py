@@ -45,13 +45,13 @@ for line in projViewScript:
     if len(line)> 1: print(DB.command(line))
 
 
-tableScript = ' '.join([line.strip() for line in readFile('SQLCreateTablesAndData.sql')]).split(';')
-for line in tableScript:
-    if len(line)> 1: print(DB.command(line))
+# tableScript = ' '.join([line.strip() for line in readFile('SQLCreateTablesAndData.sql')]).split(';')
+# for line in tableScript:
+#     if len(line)> 1: print(DB.command(line))
 
-employeeNameViewScript = ' '.join([line.strip() for line in readFile('EmployeeName_View.sql')]).split(';')
-for line in employeeNameViewScript:
-    if len(line)> 1: print(DB.command(line))
-projectEmployeeViewScript = ' '.join([line.strip() for line in readFile('ProjectHrsWorkedEmpNum_View.sql')]).split(';')
-for line in projectEmployeeViewScript:
-    if len(line)> 1: print(DB.command(line))
+# employeeNameViewScript = ' '.join([line.strip() for line in readFile('EmployeeName_View.sql')]).split(';')
+# for line in employeeNameViewScript:
+#     if len(line)> 1: print(DB.command(line))
+# projectEmployeeViewScript = ' '.join([line.strip() for line in readFile('ProjectHrsWorkedEmpNum_View.sql')]).split(';')
+# for line in projectEmployeeViewScript:
+#     if len(line)> 1: print(DB.command(line))
