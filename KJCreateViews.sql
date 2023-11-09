@@ -1,6 +1,7 @@
 DROP VIEW IF EXISTS TrainerQualification_View;
 DROP VIEW IF EXISTS TrainerName_View;
 DROP VIEW IF EXISTS TrainerActivity_View;
+DROP VIEW IF EXISTS ApprovedActivity_View;
 
 CREATE VIEW TrainerQualification_View AS
 SELECT
@@ -41,3 +42,9 @@ JOIN
     Trainer T 
 ON
     S.TrainerID = T.TrainerID;
+
+CREATE VIEW ApprovedActivity_View AS
+SELECT
+    *
+FROM
+    ApprovedActivity;

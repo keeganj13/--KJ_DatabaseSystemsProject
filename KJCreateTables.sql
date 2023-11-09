@@ -73,12 +73,8 @@ CREATE TABLE ScheduledActivity(
     StartTime       varchar(10) NULL,
     EndTime         varchar(10) NULL,
     CONSTRAINT ScheduledActivityPK PRIMARY KEY(TrainerID, LevelType, ActivityName),
-    CONSTRAINT ScheduledActivityTrainerFK FOREIGN KEY(TrainerID)
-        REFERENCES Trainer(TrainerID)
-            ON UPDATE CASCADE
-            ON DELETE CASCADE,
-    CONSTRAINT ScheduledActivityLevelNameFK FOREIGN KEY(LevelType, ActivityName)
-        REFERENCES ApprovedActivity(LevelType, ActivityName)
+    CONSTRAINT ScheduledActivityFK FOREIGN KEY(TrainerID, LevelType, ActivityName)
+        REFERENCES Qualification(TrainerID, LevelType, ActivityName)
             ON UPDATE CASCADE
             ON DELETE CASCADE
 );

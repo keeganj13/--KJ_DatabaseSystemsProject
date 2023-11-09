@@ -38,8 +38,11 @@ def getTableData(tableName, whereClause=''):
     cursor.close()
     return columnNames, rowList
 
-def buildTree(columnNames, rows, parent, scrollBar, columnWidth=150):
-    T = ttk.Treeview(master=parent, columns=columnNames, show='headings', height=6, padding=5, yscrollcommand=scrollBar.set)
+def buildTree(columnNames, rows, parent, scrollBar=None, columnWidth=150, customHeight=6):
+    if scrollBar is not None:
+        T = ttk.Treeview(master=parent, columns=columnNames, show='headings', height=customHeight, padding=5, yscrollcommand=scrollBar.set)
+    else:
+        T = ttk.Treeview(master=parent, columns=columnNames, show='headings', height=customHeight, padding=5)
     for i in range(len(columnNames)):
         T.column('# '+str(i+1), anchor=tk.CENTER, width=columnWidth)
         T.heading('# '+str(i+1), text=columnNames[i])
