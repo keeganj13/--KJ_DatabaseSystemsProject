@@ -6,77 +6,83 @@ DROP TABLE IF EXISTS ApprovedActivity;
 DROP TABLE IF EXISTS GeneralActivity;
 DROP TABLE IF EXISTS ActivityLevel;
 
-CREATE TABLE ActivityLevel(
-    LevelType       varchar(15) NOT NULL,
+CREATE TABLE ActivityLevel (
+    LevelType       VARCHAR(15) NOT NULL,
     CONSTRAINT ActivityLevelPK PRIMARY KEY(LevelType)
 );
 
-CREATE TABLE GeneralActivity(
-    ActivityName    varchar(25) NOT NULL,
+CREATE TABLE GeneralActivity (
+    ActivityName    VARCHAR(25) NOT NULL,
     CONSTRAINT GeneralActivityPK PRIMARY KEY(ActivityName)
 );
 
-CREATE TABLE ApprovedActivity(
-    LevelType       varchar(15) NOT NULL,
-    ActivityName    varchar(25) NOT NULL,
+CREATE TABLE ApprovedActivity (
+    LevelType       VARCHAR(15) NOT NULL,
+    ActivityName    VARCHAR(25) NOT NULL,
     CONSTRAINT ApprovedActivityPK PRIMARY KEY(LevelType, ActivityName),
     CONSTRAINT ApprovedActivityLevelFK FOREIGN KEY(LevelType)
         REFERENCES ActivityLevel(LevelType)
             ON UPDATE CASCADE
-            ON DELETE CASCADE,
+            ON DELETE NO ACTION,
     CONSTRAINT ApprovedActivityNameFK FOREIGN KEY(ActivityName)
         REFERENCES GeneralActivity(ActivityName)
             ON UPDATE CASCADE
-            ON DELETE CASCADE
+            ON DELETE NO ACTION
 );
 
-CREATE TABLE Locker(
-    LockerNum       Int         NOT NULL,
+CREATE TABLE Locker (
+    LockerNum       INT         NOT NULL,
+    CONSTRAINT LockerNumCheck CHECK(LockerNum >= 0 AND LockerNum <= 50),
     CONSTRAINT LockerPK PRIMARY KEY(LockerNum)
 );
 
-CREATE TABLE Trainer(
-    TrainerID       Int         NOT NULL,
-    LockerNum       Int         NOT NULL,
-    LastName        varchar(15) NOT NULL,
-    FirstName       varchar(15) NOT NULL,
-    Email           varchar(50) NULL,
-    PhoneNum        varchar(14) NULL,
+CREATE TABLE Trainer (
+    TrainerID       INT         NOT NULL,
+    LockerNum       INT         NOT NULL,
+    LastName        VARCHAR(15) NOT NULL,
+    FirstName       VARCHAR(15) NOT NULL,
+    Email           VARCHAR(50) NOT NULL,
+    PhoneNum        VARCHAR(14) NOT NULL,
+    CONSTRAINT TrainerIDCheck CHECK(TrainerID > 0),
+    CONSTRAINT UniqueEmail UNIQUE(Email),
+    CONSTRAINT UniquePhoneNum UNIQUE(PhoneNum),
     CONSTRAINT TrainerPK PRIMARY KEY(TrainerID),
     CONSTRAINT TrainerLockerFK FOREIGN KEY(LockerNum)
         REFERENCES Locker(LockerNum)
             ON UPDATE CASCADE
-            ON DELETE CASCADE
+            ON DELETE NO ACTION
 );
 
-CREATE TABLE Qualification(
-    TrainerID       Int         NOT NULL,
-    LevelType       varchar(15) NOT NULL,
-    ActivityName    varchar(25) NOT NULL,
-    ApprovalDate    varchar(10) NULL,
-    CONSTRAINT QualificationPK PRIMARY KEY(TrainerID, LevelType, ActivityName),
+CREATE TABLE Qualification (
+    QualificationID INT         NOT NULL,
+    TrainerID       INT         NOT NULL,
+    LevelType       VARCHAR(15) NOT NULL,
+    ActivityName    VARCHAR(25) NOT NULL,
+    ApprovalDate    DATE        NULL,
+    CONSTRAINT ApprovalDateCheck CHECK(ApprovalDate <= GETDATE()),
+    CONSTRAINT UniqueQualification UNIQUE(TrainerID, LevelType, ActivityName),
+    CONSTRAINT QualificationPK PRIMARY KEY(QualificationID),
     CONSTRAINT QualificationTrainerFK FOREIGN KEY(TrainerID)
         REFERENCES Trainer(TrainerID)
             ON UPDATE CASCADE
-            ON DELETE CASCADE,
-    CONSTRAINT QualificationLevelNameFK FOREIGN KEY(LevelType, ActivityName)
+            ON DELETE NO ACTION,
+    CONSTRAINT QualificationActivityFK FOREIGN KEY(LevelType, ActivityName)
         REFERENCES ApprovedActivity(LevelType, ActivityName)
             ON UPDATE CASCADE
-            ON DELETE CASCADE
+            ON DELETE NO ACTION
 );
 
-CREATE TABLE ScheduledActivity(
-    TrainerID       Int         NOT NULL,
-    LevelType       varchar(15) NOT NULL,
-    ActivityName    varchar(25) NOT NULL,
-    StartDate       varchar(10) NOT NULL,
-    StartTime       varchar(10) NULL,
-    EndTime         varchar(10) NULL,
-    CONSTRAINT ScheduledActivityPK PRIMARY KEY(TrainerID, LevelType, ActivityName),
-    CONSTRAINT ScheduledActivityFK FOREIGN KEY(TrainerID, LevelType, ActivityName)
-        REFERENCES Qualification(TrainerID, LevelType, ActivityName)
+CREATE TABLE ScheduledActivity (
+    QualificationID INT         NOT NULL,
+    StartDate       DATE        NOT NULL,
+    StartTime       VARCHAR(10) NOT NULL,
+    EndTime         VARCHAR(10) NULL,
+    CONSTRAINT StartDateCheck CHECK(StartDate >= getdate()),
+    CONSTRAINT ScheduledActivityPK PRIMARY KEY(QualificationID, StartDate, StartTime),
+    CONSTRAINT ScheduledActivityFK FOREIGN KEY(QualificationID)
+        REFERENCES Qualification(QualificationID)
             ON UPDATE CASCADE
-            ON DELETE CASCADE
+            ON DELETE NO ACTION
 );
 
 -- INSERT INTO Locker VALUES (LockerNum);
@@ -120,45 +126,45 @@ INSERT INTO ApprovedActivity VALUES ('Intense', 'Zumba');
 INSERT INTO ApprovedActivity VALUES ('Expert', 'Pilates');
 INSERT INTO ApprovedActivity VALUES ('Expert', 'Yoga');
 
--- INSERT INTO Qualification VALUES (TrainerID, LevelType, ActivityName, ApprovalDate);
-INSERT INTO Qualification VALUES (101, 'Beginner', 'Spinning', '10-09-2017');
-INSERT INTO Qualification VALUES (101, 'Easy', 'Pilates', '02-20-2019');
-INSERT INTO Qualification VALUES (101, 'Intense', 'Crossfit', '02-08-2023');
-INSERT INTO Qualification VALUES (101, 'Easy', 'Zumba', '04-19-2018');
+-- INSERT INTO Qualification VALUES (QualificationID, TrainerID, LevelType, ActivityName, ApprovalDate);
+INSERT INTO Qualification VALUES (01, 101, 'Beginner', 'Spinning', '2017-10-09');
+INSERT INTO Qualification VALUES (02, 101, 'Easy', 'Pilates', '2019-02-20');
+INSERT INTO Qualification VALUES (03, 101, 'Intense', 'Crossfit', '2023-02-08');
+INSERT INTO Qualification VALUES (04, 101, 'Easy', 'Zumba', '2018-04-19');
 
-INSERT INTO Qualification VALUES (102, 'Beginner', 'Spinning', '03-15-2016');
-INSERT INTO Qualification VALUES (102, 'Easy', 'Pilates', '01-10-2018');
-INSERT INTO Qualification VALUES (102, 'Intermediate', 'Spinning', '08-17-2020');
+INSERT INTO Qualification VALUES (05, 102, 'Beginner', 'Spinning', '2016-03-15');
+INSERT INTO Qualification VALUES (06, 102, 'Easy', 'Pilates', '2018-01-10');
+INSERT INTO Qualification VALUES (07, 102, 'Intermediate', 'Spinning', '2020-08-17');
 
-INSERT INTO Qualification VALUES (103, 'Beginner', 'Crossfit', '10-01-2017');
-INSERT INTO Qualification VALUES (103, 'Intermediate', 'Yoga', '07-22-2020');
-INSERT INTO Qualification VALUES (103, 'Expert', 'Yoga', '05-14-2023');
+INSERT INTO Qualification VALUES (08, 103, 'Beginner', 'Crossfit', '2017-10-01');
+INSERT INTO Qualification VALUES (09, 103, 'Intermediate', 'Yoga', '2020-07-22');
+INSERT INTO Qualification VALUES (10, 103, 'Expert', 'Yoga', '2023-05-14');
 
-INSERT INTO Qualification VALUES (104, 'Beginner', 'Crossfit', '06-08-2015');
-INSERT INTO Qualification VALUES (104, 'Intermediate', 'Yoga', '03-14-2021');
-INSERT INTO Qualification VALUES (104, 'Intense', 'Zumba', '12-02-2022');
+INSERT INTO Qualification VALUES (11, 104, 'Beginner', 'Crossfit', '2015-06-08');
+INSERT INTO Qualification VALUES (12, 104, 'Intermediate', 'Yoga', '2021-03-14');
+INSERT INTO Qualification VALUES (13, 104, 'Intense', 'Zumba', '2022-12-02');
 
-INSERT INTO Qualification VALUES (105, 'Beginner', 'Spinning', '06-04-2016');
-INSERT INTO Qualification VALUES (105, 'Easy', 'Zumba', '08-17-2018');
-INSERT INTO Qualification VALUES (105, 'Beginner', 'Pilates', '11-04-2020');
+INSERT INTO Qualification VALUES (14, 105, 'Beginner', 'Spinning', '2016-06-04');
+INSERT INTO Qualification VALUES (15, 105, 'Easy', 'Zumba', '2018-08-17');
+INSERT INTO Qualification VALUES (16, 105, 'Beginner', 'Pilates', '2020-11-04');
 
--- INSERT INTO ScheduledActivity VALUES (TrainerID, LevelType, ActivityName, StartDate, StartTime, EndTime);
-INSERT INTO ScheduledActivity VALUES (101, 'Beginner', 'Spinning', '11-09-2023', '6:00pm', '7:30pm');
-INSERT INTO ScheduledActivity VALUES (101, 'Intense', 'Crossfit', '11-08-2023', '2:00pm', '3:00pm');
-INSERT INTO ScheduledActivity VALUES (101, 'Easy', 'Zumba', '11-20-2023', '1:00pm', '3:00pm');
-INSERT INTO ScheduledActivity VALUES (101, 'Easy', 'Pilates', '11-19-2023', '2:00pm', '3:00pm');
+-- INSERT INTO ScheduledActivity VALUES (QualificationID, StartDate, StartTime, EndTime);
+INSERT INTO ScheduledActivity VALUES (01, '2023-12-09', '6:00pm', '7:30pm');
+INSERT INTO ScheduledActivity VALUES (03, '2023-12-08', '2:00pm', '3:00pm');
+INSERT INTO ScheduledActivity VALUES (04, '2023-12-20', '1:00pm', '3:00pm');
+INSERT INTO ScheduledActivity VALUES (02, '2023-11-19', '2:00pm', '3:00pm');
 
-INSERT INTO ScheduledActivity VALUES (102, 'Easy', 'Pilates', '11-10-2023', '1:00pm', '3:00pm');
-INSERT INTO ScheduledActivity VALUES (102, 'Beginner', 'Spinning', '11-15-2023', '6:00pm', '7:30pm');
-INSERT INTO ScheduledActivity VALUES (102, 'Intermediate', 'Spinning', '11-17-2023', '6:00pm', '7:30pm');
+INSERT INTO ScheduledActivity VALUES (06, '2023-12-10', '1:00pm', '3:00pm');
+INSERT INTO ScheduledActivity VALUES (05, '2023-11-15', '6:00pm', '7:30pm');
+INSERT INTO ScheduledActivity VALUES (07, '2023-11-17', '6:00pm', '7:30pm');
 
-INSERT INTO ScheduledActivity VALUES (103, 'Beginner', 'Crossfit', '11-06-2023', '5:00pm', '6:30pm');
-INSERT INTO ScheduledActivity VALUES (103, 'Intermediate', 'Yoga', '11-22-2023', '4:00pm', '5:00pm');
-INSERT INTO ScheduledActivity VALUES (103, 'Expert', 'Yoga', '11-14-2023', '1:00pm', '3:00pm');
+INSERT INTO ScheduledActivity VALUES (08, '2023-12-06', '5:00pm', '6:30pm');
+INSERT INTO ScheduledActivity VALUES (09, '2023-11-22', '4:00pm', '5:00pm');
+INSERT INTO ScheduledActivity VALUES (10, '2023-11-14', '1:00pm', '3:00pm');
 
-INSERT INTO ScheduledActivity VALUES (104, 'Beginner', 'Crossfit', '11-08-2023', '5:00pm', '6:30pm');
-INSERT INTO ScheduledActivity VALUES (104, 'Intermediate', 'Yoga', '11-14-2023', '1:00pm', '3:00pm');
+INSERT INTO ScheduledActivity VALUES (11, '2023-12-08', '5:00pm', '6:30pm');
+INSERT INTO ScheduledActivity VALUES (12, '2023-11-14', '1:00pm', '3:00pm');
 
-INSERT INTO ScheduledActivity VALUES (105, 'Beginner', 'Pilates', '11-04-2023', '4:00pm', '5:00pm');
-INSERT INTO ScheduledActivity VALUES (105, 'Easy', 'Zumba', '11-17-2023', '5:00pm', '6:30pm');
-INSERT INTO ScheduledActivity VALUES (105, 'Beginner', 'Spinning', '11-15-2023', '6:00pm', '7:30pm');
+INSERT INTO ScheduledActivity VALUES (16, '2023-12-04', '4:00pm', '5:00pm');
+INSERT INTO ScheduledActivity VALUES (15, '2023-11-17', '5:00pm', '6:30pm');
+INSERT INTO ScheduledActivity VALUES (14, '2023-11-15', '6:00pm', '7:30pm');
