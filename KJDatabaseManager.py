@@ -84,8 +84,9 @@ def runSQLFile(fileName):
         print(e)
 
 # runSQLFile('CreateBookstoresDB_TablesScript - v3(1).sql')
-runSQLFile('KJCreateTables.sql')
-runSQLFile('KJCreateViews.sql')
+# runSQLFile('KJCreateTables.sql')
+# runSQLFile('KJCreateViews.sql')
+runSQLFile('KJCreateProcedure.sql')
 # runSQLFile('SQLCreateTablesAndData.sql')
 # runSQLFile('EmployeeName_View.sql')
 # runSQLFile('ProjectHrsWorkedEmpNum_View.sql')

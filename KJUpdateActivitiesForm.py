@@ -124,68 +124,55 @@ def showGUI():
     TrainerTree.grid(column=0,row=1)
     TrainerSb.config(command=TrainerTree.yview)
     
-    BtnFrm = tk.Frame(master=window, relief=tk.GROOVE, pady=10, width=500)
-    BtnFrm.pack()
+    ApprovedActivityInfoFrm = tk.Frame(master=window, relief=tk.GROOVE, padx=50, pady=10)
+    ApprovedActivityInfoFrm.pack(anchor='w')
+    ttk.Label(master=ApprovedActivityInfoFrm, text='Qualifications:').grid(column=0, row=0, sticky='w')
+    ApprovedActivitySb = ttk.Scrollbar(master=ApprovedActivityInfoFrm, orient='vertical')
+    ApprovedActivitySb.grid(column=1, row=1, sticky='ns')
+    ApprovedActivityTree = buildTree(['LevelType', 'ActivityName', 'ApprovalDate'], [], ApprovedActivityInfoFrm, ApprovedActivitySb)
+    ApprovedActivitySb.config(command=ApprovedActivityTree.yview)
+    ApprovedActivityTree.grid(column=0, row=1)
 
-    def QualificationBtnHandler(e = None):
+    updateApprovalDateFrm = tk.Frame(master=window, relief=tk.GROOVE, padx=50, pady=10)
+    updateApprovalDateFrm.pack(anchor='w')
+    tk.Label(master=updateApprovalDateFrm, text='Approval Date:').grid(column=0, row=0, sticky='w')
+    updateEntry = tk.Entry(master=updateApprovalDateFrm, width=25, background='white')
+    updateEntry.grid(column=1,row=0,padx=10)
+
+    def TrainerTreeHandler(e=None):
         try:
             TrainerID = TrainerTree.item(TrainerTree.focus())['values'][0]
-            LastName = TrainerTree.item(TrainerTree.focus())['values'][1]
-            FirstName = TrainerTree.item(TrainerTree.focus())['values'][2]
-
-            win = GUI(f"{FirstName} {LastName}\'s Qualifications")
-            QualificationInfoFrm = tk.Frame(master=win.window, relief=tk.GROOVE, padx=50, pady=10, width=500)
-            QualificationInfoFrm.pack(anchor='w')
-            tk.Label(master=QualificationInfoFrm, text='Qualifications:', width=13).grid(column=0,row=0, sticky='w')
-            QualificationSb = tk.Scrollbar(master=QualificationInfoFrm, orient='vertical')
-            QualificationSb.grid(column=1,row=1,sticky='ns')
-            QualificationTableData = getTableData(tableName='TrainerQualification_View', where=f'TrainerID = {TrainerID}', columns='LevelType, ActivityName, ApprovalDate')
-            QualificationTree = buildTree(QualificationTableData.columns, QualificationTableData.rows, QualificationInfoFrm, QualificationSb)
-            QualificationSb.config(command=QualificationTree.yview)
-            QualificationTree.grid(column=0,row=1)
-        except Exception as e:
-            print(e)
-
-    ttk.Button(master=BtnFrm, text='Show Trainer Qualifications', command=QualificationBtnHandler).grid(column=0,row=0)
-
-    def ActivityBtnHandler(e = None):
+            TrainerQualificationTableData = getTableData('TrainerQualification_View',where=f'TrainerID = {TrainerID}', columns='LevelType, ActivityName, ApprovalDate')
+            ApprovedActivityTree.delete(*ApprovedActivityTree.get_children())
+            for row in TrainerQualificationTableData.rows:
+                ApprovedActivityTree.insert('', 'end', values=row, text=row)
+        except Exception as err:
+            print(err)
+    
+    def ApprovedActivityTreeHandler(e=None):
         try:
+            ApprovalDate = ApprovedActivityTree.item(ApprovedActivityTree.focus())['values'][2]
+            updateEntry.delete(0, 'end')
+            updateEntry.insert(0, ApprovalDate)
+        except Exception as err:
+            print(err)
+    
+    def updateBtnHandler(e = None):
+        try:
+            ApprovalDate = updateEntry.get()
             TrainerID = TrainerTree.item(TrainerTree.focus())['values'][0]
-            LastName = TrainerTree.item(TrainerTree.focus())['values'][1]
-            FirstName = TrainerTree.item(TrainerTree.focus())['values'][2]
+            LevelType = ApprovedActivityTree.item(ApprovedActivityTree.focus())['values'][0]
+            ActivityName = ApprovedActivityTree.item(ApprovedActivityTree.focus())['values'][1]
+            commandStr = f'execute UpdateApprovalDate {TrainerID}, {LevelType}, {ActivityName}, {ApprovalDate}'
+            print(commandStr, 'h')
+            DB.command(commandStr)
+            TrainerTreeHandler(e)
+        except Exception as err:
+            print(err)
 
-            win = GUI(f'{FirstName} {LastName}\'s Activities')
-            ActivityInfoFrm = tk.Frame(master=win.window, relief=tk.GROOVE, padx=50, pady=10)
-            ActivityInfoFrm.pack(anchor='w')
-            ttk.Label(master=ActivityInfoFrm, text='Activities:').grid(column=0,row=0, sticky='w')
-            ActivitySb = tk.Scrollbar(master=ActivityInfoFrm, orient='vertical')
-            ActivitySb.grid(column=1,row=1,sticky='ns')
-            ActivityTableData = getTableData(tableName='TrainerActivity_View', where=f'TrainerID = {TrainerID}', columns='LevelType, ActivityName, StartDate, StartTime, EndTime')
-            ActivityTree = buildTree(columnNames=ActivityTableData.columns, rows=ActivityTableData.rows, parent=ActivityInfoFrm, scrollBar=ActivitySb)
-            ActivitySb.config(command=ActivityTree.yview)
-            ActivityTree.grid(column=0,row=1)
-        except Exception as e:
-            print(e)
+    tk.Button(master=updateApprovalDateFrm, text='Update Approval Date', command=updateBtnHandler).grid(column=2,row=0,padx=10)
 
-    ttk.Button(master=BtnFrm, text='Show Trainer Activities', command=ActivityBtnHandler).grid(column=1,row=0)
-
-    def approvedActivityBtnHandler(e = None):
-        try:
-            win = GUI('Approved Activites')
-
-            approvedActivityInfoFrm = tk.Frame(master=win.window, relief=tk.GROOVE, padx=50, pady=10)
-            approvedActivityInfoFrm.pack(anchor='w')
-            ttk.Label(master=approvedActivityInfoFrm, text='Approved Activities:').grid(column=0, row=0, sticky='w')
-            approvedActivitySb = ttk.Scrollbar(master=approvedActivityInfoFrm, orient='vertical')
-            approvedActivitySb.grid(column=1, row=1, sticky='ns')
-            approvedActivityTableData = getTableData('ApprovedActivity_View')
-            approvedActivityTree = buildTree(approvedActivityTableData.columns, approvedActivityTableData.rows, approvedActivityInfoFrm, approvedActivitySb)
-            approvedActivitySb.config(command=approvedActivityTree.yview)
-            approvedActivityTree.grid(column=0, row=1)
-        except Exception as e:
-            print(e)
-
-    ttk.Button(master=BtnFrm, text='Show Approved Activities', command=approvedActivityBtnHandler).grid(column=2,row=0)
-
+    TrainerTree.bind('<ButtonRelease-1>', TrainerTreeHandler)
+    ApprovedActivityTree.bind('<ButtonRelease-1>', ApprovedActivityTreeHandler)
     window.mainloop()
 showGUI()

@@ -239,6 +239,7 @@ def main():
             newHoursWorked = hoursWorkedTxt.get('1.0', 'end')
             newHoursWorked = float(newHoursWorked)
             cmdStr = f'execute UpdateAssignment {projectID}, {employeeNum}, {newHoursWorked}'
+            print(cmdStr)
             DB.command(cmdStr)
             employeeTreeHandler()
         except Exception as e:
