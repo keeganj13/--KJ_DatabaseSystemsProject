@@ -25,8 +25,8 @@ class DatabaseManager:
         cursor = self.connection.cursor()
         try:
             cursor.execute(SQLCommand)
-            cursor.commit()
             cursor.close()
+            cursor.commit()
             return 'Command success.'
         except Exception as e:
             return e, SQLCommand
