@@ -7,13 +7,19 @@ DROP TABLE IF EXISTS GeneralActivity;
 DROP TABLE IF EXISTS ActivityLevel;
 
 CREATE TABLE ActivityLevel (
+    LevelID         INT         NOT NULL,
     LevelType       VARCHAR(15) NOT NULL,
-    CONSTRAINT ActivityLevelPK PRIMARY KEY(LevelType)
+    LevelDescription VARCHAR(50) NULL,
+    CONSTRAINT ActivityLevelPK PRIMARY KEY(LevelID),
+    CONSTRAINT UniqueLevel UNIQUE(LevelType)
 );
 
 CREATE TABLE GeneralActivity (
+    NameID          INT         NOT NULL,
     ActivityName    VARCHAR(25) NOT NULL,
-    CONSTRAINT GeneralActivityPK PRIMARY KEY(ActivityName)
+    ActivityDescription VARCHAR(50) NULL,
+    CONSTRAINT GeneralActivityPK PRIMARY KEY(NameID),
+    CONSTRAINT UniqueName UNIQUE(ActivityName)
 );
 
 CREATE TABLE ApprovedActivity (
@@ -99,19 +105,19 @@ INSERT INTO Trainer VALUES (103, 03, 'Hobbs', 'Fiona', 'fh1990@gmail.com', '1-88
 INSERT INTO Trainer VALUES (104, 04, 'Brown', 'Jarod', 'jbrown49@yahoo.com', '1-456-788-1149');
 INSERT INTO Trainer VALUES (105, 05, 'Carrey', 'Cassandra', 'ccarr11@gmail.com', '1-145-555-1689');
 
--- INSERT INTO GeneralActivity VALUES (ActivityName);
-INSERT INTO GeneralActivity VALUES ('Spinning');
-INSERT INTO GeneralActivity VALUES ('Yoga');
-INSERT INTO GeneralActivity VALUES ('Zumba');
-INSERT INTO GeneralActivity VALUES ('Pilates');
-INSERT INTO GeneralActivity VALUES ('Crossfit');
+-- INSERT INTO GeneralActivity VALUES (NameID, ActivityName, ActivityDescription);
+INSERT INTO GeneralActivity VALUES (1, 'Spinning', '');
+INSERT INTO GeneralActivity VALUES (2, 'Yoga', '');
+INSERT INTO GeneralActivity VALUES (3, 'Zumba', '');
+INSERT INTO GeneralActivity VALUES (4, 'Pilates', '');
+INSERT INTO GeneralActivity VALUES (5, 'Crossfit', '');
 
--- INSERT INTO ActivityLevel VALUES (LevelType);
-INSERT INTO ActivityLevel VALUES ('Beginner');
-INSERT INTO ActivityLevel VALUES ('Easy');
-INSERT INTO ActivityLevel VALUES ('Intermediate');
-INSERT INTO ActivityLevel VALUES ('Intense');
-INSERT INTO ActivityLevel VALUES ('Expert');
+-- INSERT INTO ActivityLevel VALUES (LevelID, LevelType, LevelDescription);
+INSERT INTO ActivityLevel VALUES (1, 'Beginner', '');
+INSERT INTO ActivityLevel VALUES (2, 'Easy', '');
+INSERT INTO ActivityLevel VALUES (3, 'Intermediate', '');
+INSERT INTO ActivityLevel VALUES (4, 'Intense', '');
+INSERT INTO ActivityLevel VALUES (5, 'Expert', '');
 
 -- INSERT INTO ApprovedActivity VALUES (LevelType, ActivityName);
 INSERT INTO ApprovedActivity VALUES ('Beginner', 'Crossfit');
@@ -155,16 +161,16 @@ INSERT INTO ScheduledActivity VALUES (04, '2023-12-20', '1:00pm', '3:00pm');
 INSERT INTO ScheduledActivity VALUES (02, '2023-11-19', '2:00pm', '3:00pm');
 
 INSERT INTO ScheduledActivity VALUES (06, '2023-12-10', '1:00pm', '3:00pm');
-INSERT INTO ScheduledActivity VALUES (05, '2023-11-15', '6:00pm', '7:30pm');
-INSERT INTO ScheduledActivity VALUES (07, '2023-11-17', '6:00pm', '7:30pm');
+INSERT INTO ScheduledActivity VALUES (05, '2023-12-15', '6:00pm', '7:30pm');
+INSERT INTO ScheduledActivity VALUES (07, '2023-12-17', '6:00pm', '7:30pm');
 
 INSERT INTO ScheduledActivity VALUES (08, '2023-12-06', '5:00pm', '6:30pm');
 INSERT INTO ScheduledActivity VALUES (09, '2023-11-22', '4:00pm', '5:00pm');
-INSERT INTO ScheduledActivity VALUES (10, '2023-11-14', '1:00pm', '3:00pm');
+INSERT INTO ScheduledActivity VALUES (10, '2023-12-14', '1:00pm', '3:00pm');
 
 INSERT INTO ScheduledActivity VALUES (11, '2023-12-08', '5:00pm', '6:30pm');
-INSERT INTO ScheduledActivity VALUES (12, '2023-11-14', '1:00pm', '3:00pm');
+INSERT INTO ScheduledActivity VALUES (12, '2023-12-14', '1:00pm', '3:00pm');
 
 INSERT INTO ScheduledActivity VALUES (16, '2023-12-04', '4:00pm', '5:00pm');
-INSERT INTO ScheduledActivity VALUES (15, '2023-11-17', '5:00pm', '6:30pm');
-INSERT INTO ScheduledActivity VALUES (14, '2023-11-15', '6:00pm', '7:30pm');
+INSERT INTO ScheduledActivity VALUES (15, '2023-12-17', '5:00pm', '6:30pm');
+INSERT INTO ScheduledActivity VALUES (14, '2023-12-15', '6:00pm', '7:30pm');

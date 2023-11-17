@@ -163,8 +163,7 @@ def showGUI():
             TrainerID = TrainerTree.item(TrainerTree.focus())['values'][0]
             LevelType = ApprovedActivityTree.item(ApprovedActivityTree.focus())['values'][0]
             ActivityName = ApprovedActivityTree.item(ApprovedActivityTree.focus())['values'][1]
-            commandStr = f'execute UpdateApprovalDate {TrainerID}, {LevelType}, {ActivityName}, {ApprovalDate}'
-            print(commandStr, 'h')
+            commandStr = f"execute UpdateApprovalDate {TrainerID}, '{LevelType}', '{ActivityName}', '{ApprovalDate}'"
             DB.command(commandStr)
             TrainerTreeHandler(e)
         except Exception as err:
