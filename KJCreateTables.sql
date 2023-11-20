@@ -158,14 +158,14 @@ INSERT INTO Qualification VALUES (16, 105, 'Beginner', 'Pilates', '2020-11-04');
 INSERT INTO ScheduledActivity VALUES (01, '2023-12-09', '6:00pm', '7:30pm');
 INSERT INTO ScheduledActivity VALUES (03, '2023-12-08', '2:00pm', '3:00pm');
 INSERT INTO ScheduledActivity VALUES (04, '2023-12-20', '1:00pm', '3:00pm');
-INSERT INTO ScheduledActivity VALUES (02, '2023-11-19', '2:00pm', '3:00pm');
+INSERT INTO ScheduledActivity VALUES (02, '2023-12-19', '2:00pm', '3:00pm');
 
 INSERT INTO ScheduledActivity VALUES (06, '2023-12-10', '1:00pm', '3:00pm');
 INSERT INTO ScheduledActivity VALUES (05, '2023-12-15', '6:00pm', '7:30pm');
 INSERT INTO ScheduledActivity VALUES (07, '2023-12-17', '6:00pm', '7:30pm');
 
 INSERT INTO ScheduledActivity VALUES (08, '2023-12-06', '5:00pm', '6:30pm');
-INSERT INTO ScheduledActivity VALUES (09, '2023-11-22', '4:00pm', '5:00pm');
+INSERT INTO ScheduledActivity VALUES (09, '2023-12-22', '4:00pm', '5:00pm');
 INSERT INTO ScheduledActivity VALUES (10, '2023-12-14', '1:00pm', '3:00pm');
 
 INSERT INTO ScheduledActivity VALUES (11, '2023-12-08', '5:00pm', '6:30pm');
