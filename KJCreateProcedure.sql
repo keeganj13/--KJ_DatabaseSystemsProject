@@ -6,7 +6,7 @@ CREATE PROCEDURE UpdateApprovalDate
     @ActName VARCHAR(25),
     @ApprvlDate VARCHAR(10)
 AS 
-    IF CAST(@ApprvlDate AS DATE) < CAST(GETDATE() AS DATE)
+    IF CAST(@ApprvlDate AS DATE) <= CAST(GETDATE() AS DATE)
         UPDATE  Qualification
         SET     ApprovalDate = @ApprvlDate
         WHERE   TrainerID = @TID AND 
